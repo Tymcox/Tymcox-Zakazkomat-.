@@ -1,0 +1,36 @@
+name: Validate ZAKÁZKOMAT
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Pages Functions syntax
+        run: |
+          find functions -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Check required project files
+        run: |
+          test -s index.html
+          test -s admin.html
+          test -s schema.sql
+          test -s functions/api/lead.js
+          test -s functions/api/partner.js
+          test -s functions/api/health.js
+          test -s functions/api/admin/leads.js
+      - name: Check database schema
+        run: |
+          python - <<'PY'
+          import sqlite3
+          db=sqlite3.connect(':memory:')
+          db.executescript(open('schema.sql', encoding='utf-8').read())
+          assert db.execute("select name from sqlite_master where type='table' and name='leads'").fetchone()
+          assert db.execute("select name from sqlite_master where type='table' and name='partner_applications'").fetchone()
+          print('D1-compatible SQLite schema parsed successfully')
+          PY
