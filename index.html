@@ -33,7 +33,7 @@ footer{background:#06101f;color:#c2ccda;padding:38px 0}.foot{display:flex;justif
 <div class="field full hp" aria-hidden="true"><label for="website">Nevyplňujte</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
 <div class="field full"><label class="consent"><input type="checkbox" name="consent" value="yes" required><span>Souhlasím se zpracováním údajů za účelem vyřízení této poptávky. <a href="/ochrana-udaju.html" target="_blank" rel="noopener">Informace o zpracování údajů</a>. *</span></label></div>
 </div><button class="btn gold submit" type="submit">Odeslat nezávaznou poptávku</button><div class="status" id="formStatus" role="status" aria-live="polite"></div><p class="notice">Odesláním poptávky nevzniká smlouva o dílo ani povinnost zakázku přijmout.</p></form></div></div></section>
-<section class="partner" id="firmy"><div class="wrap"><div class="partnerbox"><div><div class="eyebrow">Pro realizační firmy a řemeslníky</div><h3>Chcete nové zakázky?</h3><p>Pošlete nám základní údaje o firmě a oborech, ve kterých působíte.</p></div><a class="btn gold" href="mailto:safry.jan@gmail.com?subject=Spoluprace%20se%20ZAKAZKOMATEM">Nabídnout spolupráci</a></div></div></section>
+<section class="partner" id="firmy"><div class="wrap"><div class="partnerbox"><div><div class="eyebrow">Pro realizační firmy a řemeslníky</div><h3>Chcete nové zakázky?</h3><p>Pošlete nám základní údaje o firmě a oborech, ve kterých působíte.</p></div><form id="partnerForm" class="grid" style="max-width:560px;flex:1"><div class="field"><label for="company">Firma *</label><input id="company" name="company" required maxlength="160"></div><div class="field"><label for="contact">Kontaktní osoba *</label><input id="contact" name="contact" required maxlength="120"></div><div class="field"><label for="pemail">E-mail *</label><input id="pemail" name="email" type="email" required maxlength="254"></div><div class="field"><label for="pphone">Telefon *</label><input id="pphone" name="phone" required maxlength="40"></div><div class="field"><label for="trade">Obor *</label><input id="trade" name="trade" required maxlength="160" placeholder="Např. montáže ocelových konstrukcí"></div><div class="field"><label for="regions">Regiony působnosti *</label><input id="regions" name="regions" required maxlength="300" placeholder="Např. Jihočeský kraj"></div><div class="field full"><label for="pnote">Poznámka</label><textarea id="pnote" name="note" maxlength="2000"></textarea></div><div class="field full hp" aria-hidden="true"><label for="pwebsite">Nevyplňujte</label><input id="pwebsite" name="website" tabindex="-1" autocomplete="off"></div><div class="field full"><button class="btn gold" type="submit">Odeslat registraci firmy</button><div class="status" id="partnerStatus" role="status" aria-live="polite"></div></div></form></div></div></section>
 </main>
 <footer><div class="wrap"><div class="foot"><div><strong>◈ ZAKÁZKOMAT</strong><br>Propojujeme poptávky s řemeslem.</div><div>Kontakt: <a href="mailto:safry.jan@gmail.com">safry.jan@gmail.com</a></div><div><a href="/ochrana-udaju.html">Ochrana osobních údajů</a></div></div><div class="copy">© <span id="year"></span> ZAKÁZKOMAT. Provozovatel: OSVČ, IČO 11771283. Před ostrým spuštěním doplňte úplné identifikační údaje a sídlo.</div></div></footer>
 <script>
@@ -49,5 +49,15 @@ form.addEventListener('submit',async e=>{
   status.textContent='Děkujeme! Poptávka byla bezpečně přijata.';
   form.reset();
  }catch(err){status.textContent=err.message+' Zkuste to prosím později nebo napište na safry.jan@gmail.com.';}
+});
+
+const partnerForm=document.getElementById('partnerForm'),partnerStatus=document.getElementById('partnerStatus');
+partnerForm.addEventListener('submit',async e=>{
+ e.preventDefault();partnerStatus.textContent='Odesílám registraci…';
+ const data=Object.fromEntries(new FormData(partnerForm).entries());
+ try{const res=await fetch('/api/partner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const out=await res.json().catch(()=>({}));if(!res.ok)throw new Error(out.error||'Registraci se nepodařilo odeslat.');
+ partnerStatus.textContent='Děkujeme! Registraci firmy jsme přijali a ozveme se vám.';partnerForm.reset();
+ }catch(err){partnerStatus.textContent=err.message+' Zkuste to později nebo napište na safry.jan@gmail.com.';}
 });
 </script></body></html>
