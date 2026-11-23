@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS partner_applications (
  trade TEXT NOT NULL,
  regions TEXT NOT NULL,
  note TEXT,
+ privacy_notice_ack INTEGER NOT NULL DEFAULT 0 CHECK(privacy_notice_ack IN (0,1)),
+ ip_hash TEXT NOT NULL DEFAULT '',
  created_at TEXT NOT NULL DEFAULT (datetime('now')),
  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected'))
 );
